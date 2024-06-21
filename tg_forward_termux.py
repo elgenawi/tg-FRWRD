@@ -1,4 +1,3 @@
-import time
 import asyncio
 from pyrogram import Client
 
@@ -7,36 +6,31 @@ api_id = '22093899'  # Your Telegram API ID
 api_hash = '562dc52e18df1a5912bd82598c1cfc4f'  # Your Telegram API hash
 source_channel = 'porn626'  # The username or ID of the source channel
 destination_channel = 'shdjdjdyzr'  # The ID of your destination channel
-delay_seconds = 3  # Delay between each forwarded video in seconds
+delay_seconds = 3  # Delay between each forwarded post in seconds
 
 # Initialize the client
 app = Client("my_account", api_id=api_id, api_hash=api_hash)
 
-# Function to forward videos from source to destination
-async def forward_videos():
+# Function to forward posts with links from source to destination
+async def forward_posts_with_links():
     async with app:
-        # List to store all messages
-        all_messages = []
-        
         # Fetch all messages from the source channel
         async for message in app.get_chat_history(source_channel):
-            all_messages.append(message)
-        
-        # Process messages in reverse order (from first to last)
-        for message in reversed(all_messages):
-            # Check if the message contains a video
-            if message.video:
-                # Forward the video to the destination channel without sender's name
-                await app.send_video(
-                    chat_id=destination_channel,
-                    video=message.video.file_id,
-                    caption=message.caption  # Forward the caption if any
-                )
-                # Print a log
-                print(f"Forwarded video {message.video.file_id} to {destination_channel}")
-                # Wait for the specified delay
-                await asyncio.sleep(delay_seconds)
+            # Check if the message contains text (assuming the link is within the text)
+            if message.text:
+                # Check if the text contains a link (you can improve this check based on your specific case)
+                if "http" in message.text:
+                    # Forward the post with the link to the destination channel
+                    await app.send_message(
+                        chat_id=destination_channel,
+                        text=message.text,
+                        disable_notification=True  # Optional: disable notifications
+                    )
+                    # Print a log
+                    print(f"Forwarded post with link from {source_channel} to {destination_channel}")
+                    # Wait for the specified delay
+                    await asyncio.sleep(delay_seconds)
 
 # Run the function
 if __name__ == "__main__":
-    asyncio.run(forward_videos())
+    asyncio.run(forward_posts_with_links())
